@@ -33,7 +33,8 @@ class ArrayHasKeyAndValue extends \PHPUnit_Framework_Constraint
     {
         return sprintf(
             'has the key %s and its value %s',
-            \PHPUnit_Util_Type::export($this->key),
+//            \PHPUnit_Util_Type::export($this->key),
+            $this->key,
             $this->constraint->toString()
         );
     }

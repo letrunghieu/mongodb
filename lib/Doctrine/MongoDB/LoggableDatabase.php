@@ -20,6 +20,7 @@
 namespace Doctrine\MongoDB;
 
 use Doctrine\Common\EventManager;
+use MongoDB\Database as MongoDB;
 
 /**
  * Wrapper for the MongoDB class with logging functionality.
@@ -41,12 +42,12 @@ class LoggableDatabase extends Database implements Loggable
      * Constructor.
      *
      * @param Connection   $connection     Connection used to create Collections
-     * @param \MongoDB     $mongoDB        MongoDB instance being wrapped
+     * @param MongoDB     $mongoDB        MongoDB instance being wrapped
      * @param EventManager $evm            EventManager instance
      * @param integer      $numRetries     Number of times to retry queries
      * @param callable     $loggerCallable The logger callable
      */
-    public function __construct(Connection $connection, \MongoDB $mongoDB, EventManager $evm, $numRetries, $loggerCallable)
+    public function __construct(Connection $connection, MongoDB $mongoDB, EventManager $evm, $numRetries, $loggerCallable)
     {
         if ( ! is_callable($loggerCallable)) {
             throw new \InvalidArgumentException('$loggerCallable must be a valid callback');

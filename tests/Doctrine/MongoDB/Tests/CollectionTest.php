@@ -5,10 +5,11 @@ namespace Doctrine\MongoDB\Tests;
 use Doctrine\Common\EventManager;
 use Doctrine\MongoDB\ArrayIterator;
 use Doctrine\MongoDB\Collection;
-use Doctrine\MongoDB\Connection;
 use Doctrine\MongoDB\Database;
 use Doctrine\MongoDB\Tests\Constraint\ArrayHasKeyAndValue;
 use MongoCollection;
+use MongoDB\BSON\Javascript;
+use MongoDB\Driver\ReadPreference;
 
 class CollectionTest extends \PHPUnit_Framework_TestCase
 {
@@ -503,12 +504,12 @@ class CollectionTest extends \PHPUnit_Framework_TestCase
         $mongoCollection->expects($this->exactly(2))
             ->method('getReadPreference')
             ->will($this->returnValue(array(
-                'type' => \MongoClient::RP_PRIMARY,
+                'type' => ReadPreference::RP_PRIMARY,
             )));
 
         $mongoCollection->expects($this->once())
             ->method('setReadPreference')
-            ->with(\MongoClient::RP_SECONDARY_PREFERRED);
+            ->with(ReadPreference::RP_SECONDARY_PREFERRED);
 
         $collection = $this->getTestCollection($this->getMockDatabase(), $mongoCollection);
 
@@ -522,13 +523,13 @@ class CollectionTest extends \PHPUnit_Framework_TestCase
         $mongoCollection->expects($this->exactly(2))
             ->method('getReadPreference')
             ->will($this->returnValue(array(
-                'type' => \MongoClient::RP_PRIMARY_PREFERRED,
+                'type' => ReadPreference::RP_PRIMARY_PREFERRED,
                 'tagsets' => array(array('dc' => 'east')),
             )));
 
         $mongoCollection->expects($this->once())
             ->method('setReadPreference')
-            ->with(\MongoClient::RP_SECONDARY_PREFERRED, array(array('dc' => 'east')))
+            ->with(ReadPreference::RP_SECONDARY_PREFERRED, array(array('dc' => 'east')))
             ->will($this->returnValue(false));
 
         $collection = $this->getTestCollection($this->getMockDatabase(), $mongoCollection);
@@ -542,12 +543,12 @@ class CollectionTest extends \PHPUnit_Framework_TestCase
 
         $mongoCollection->expects($this->at(0))
             ->method('setReadPreference')
-            ->with(\MongoClient::RP_PRIMARY)
+            ->with(ReadPreference::RP_PRIMARY)
             ->will($this->returnValue(true));
 
         $mongoCollection->expects($this->at(1))
             ->method('setReadPreference')
-            ->with(\MongoClient::RP_SECONDARY_PREFERRED, array(array('dc' => 'east')))
+            ->with(ReadPreference::RP_SECONDARY_PREFERRED, array(array('dc' => 'east')))
             ->will($this->returnValue(true));
 
         $collection = $this->getTestCollection($this->getMockDatabase(), $mongoCollection);
@@ -571,10 +572,10 @@ class CollectionTest extends \PHPUnit_Framework_TestCase
         $command = array('group' => array(
             'ns' => self::collectionName,
             'initial' => (object) $initial,
-            '$reduce' => new \MongoCode('reduce'),
+            '$reduce' => new Javascript('reduce'),
             'cond' => (object) $options['cond'],
             'key' => $keys,
-            'finalize' => new \MongoCode('finalize'),
+            'finalize' => new Javascript('finalize'),
         ));
 
         $commandResult = array('ok' => 1, 'retval' => $grouped, 'count' => 5, 'keys' => 2);
@@ -685,11 +686,11 @@ class CollectionTest extends \PHPUnit_Framework_TestCase
             ->method('command')
             ->with($this->logicalAnd(
                 new ArrayHasKeyAndValue('mapreduce', self::collectionName),
-                new ArrayHasKeyAndValue('map', new \MongoCode('map')),
-                new ArrayHasKeyAndValue('reduce', new \MongoCode('reduce')),
+                new ArrayHasKeyAndValue('map', new Javascript('map')),
+                new ArrayHasKeyAndValue('reduce', new Javascript('reduce')),
                 new ArrayHasKeyAndValue('out', $out),
                 new ArrayHasKeyAndValue('query', (object) array('deleted' => false)),
-                new ArrayHasKeyAndValue('finalize', new \MongoCode('finalize'))
+                new ArrayHasKeyAndValue('finalize', new Javascript('finalize'))
             ))
             ->will($this->returnValue($commandResult));
 
@@ -1055,7 +1056,7 @@ class CollectionTest extends \PHPUnit_Framework_TestCase
 
     private function getMockMongoCollection()
     {
-        $mc = $this->getMockBuilder('MongoCollection')
+        $mc = $this->getMockBuilder(\MongoDB\Collection::class)
             ->disableOriginalConstructor()
             ->getMock();
 

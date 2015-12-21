@@ -13,6 +13,8 @@ use Doctrine\MongoDB\Event\MapReduceEventArgs;
 use Doctrine\MongoDB\Event\MutableEventArgs;
 use Doctrine\MongoDB\Event\NearEventArgs;
 use Doctrine\MongoDB\Event\UpdateEventArgs;
+use MongoDB\BSON\Javascript;
+use MongoDB\BSON\ObjectID;
 
 class CollectionEventsTest extends \PHPUnit_Framework_TestCase
 {
@@ -46,7 +48,7 @@ class CollectionEventsTest extends \PHPUnit_Framework_TestCase
     {
         $documents = array(array('x' => 1));
         $options = array('continueOnError' => true);
-        $result = array(array('_id' => new \MongoId(), 'x' => 1));
+        $result = array(array('_id' => new ObjectID(), 'x' => 1));
 
         $collection = $this->getMockCollection(array('doBatchInsert' => $result));
 
@@ -172,8 +174,8 @@ class CollectionEventsTest extends \PHPUnit_Framework_TestCase
     {
         $keys = 'x';
         $initial = array('count' => 0);
-        $reduce = new \MongoCode('');
-        $options = array('finalize' => new \MongoCode(''));
+        $reduce = new Javascript('');
+        $options = array('finalize' => new Javascript(''));
         $result = array(array('count' => '1'));
 
         $collection = $this->getMockCollection(array('doGroup' => $result));
@@ -190,7 +192,7 @@ class CollectionEventsTest extends \PHPUnit_Framework_TestCase
     {
         $document = array('x' => 1);
         $options = array('w' => 1);
-        $result = array('_id' => new \MongoId(), 'x' => 1);
+        $result = array('_id' => new ObjectID(), 'x' => 1);
 
         $collection = $this->getMockCollection(array('doInsert' => $result));
 
@@ -204,11 +206,11 @@ class CollectionEventsTest extends \PHPUnit_Framework_TestCase
 
     public function testMapReduce()
     {
-        $map = new \MongoCode('');
-        $reduce = new \MongoCode('');
+        $map = new Javascript('');
+        $reduce = new Javascript('');
         $out = array('inline' => true);
         $query = array('x' => 1);
-        $options = array('finalize' => new \MongoCode(''));
+        $options = array('finalize' => new Javascript(''));
         $result = array(array('count' => '1'));
 
         $collection = $this->getMockCollection(array('doMapReduce' => $result));
@@ -258,7 +260,7 @@ class CollectionEventsTest extends \PHPUnit_Framework_TestCase
     {
         $document = array('x' => 1);
         $options = array('w' => 1);
-        $result = array('_id' => new \MongoId(), 'x' => 1);
+        $result = array('_id' => new ObjectID(), 'x' => 1);
 
         $collection = $this->getMockCollection(array('doSave' => $result));
 
@@ -345,7 +347,7 @@ class CollectionEventsTest extends \PHPUnit_Framework_TestCase
 
     private function getMockMongoCollection()
     {
-        return $this->getMockBuilder('MongoCollection')
+        return $this->getMockBuilder(\MongoDB\Collection::class)
             ->disableOriginalConstructor()
             ->getMock();
     }

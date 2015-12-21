@@ -21,6 +21,7 @@ namespace Doctrine\MongoDB;
 
 use Doctrine\Common\EventManager;
 use Doctrine\MongoDB\Event\EventArgs;
+use MongoDB\Client;
 
 /**
  * Wrapper for the MongoClient class.
@@ -33,7 +34,7 @@ class Connection
     /**
      * The PHP MongoClient instance being wrapped.
      *
-     * @var \MongoClient
+     * @var Client
      */
     protected $mongoClient;
 
@@ -78,7 +79,7 @@ class Connection
      */
     public function __construct($server = null, array $options = array(), Configuration $config = null, EventManager $evm = null)
     {
-        if ($server instanceof \MongoClient || $server instanceof \Mongo) {
+        if ($server instanceof Client || $server instanceof \Mongo) {
             $this->mongoClient = $server;
         } else {
             $this->server = $server;
@@ -279,7 +280,7 @@ class Connection
         $options = isset($options['wTimeout']) ? $this->convertWriteTimeout($options) : $options;
 
         $this->mongoClient = $this->retry(function() use ($server, $options) {
-            return new \MongoClient($server, $options);
+            return new Client($server, $options);
         });
 
         if ($this->eventManager->hasListeners(Events::postConnect)) {
@@ -401,7 +402,7 @@ class Connection
      */
     protected function doSelectDatabase($name)
     {
-        $mongoDB = $this->mongoClient->selectDB($name);
+        $mongoDB = $this->mongoClient->selectDatabase($name);
         $numRetries = $this->config->getRetryQuery();
         $loggerCallable = $this->config->getLoggerCallable();
 

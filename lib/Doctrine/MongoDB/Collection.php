@@ -30,6 +30,8 @@ use Doctrine\MongoDB\Event\MutableEventArgs;
 use Doctrine\MongoDB\Event\NearEventArgs;
 use Doctrine\MongoDB\Event\UpdateEventArgs;
 use Doctrine\MongoDB\Exception\ResultException;
+use MongoDB\BSON\Javascript;
+use MongoDB\Collection as MongoCollection;
 use GeoJson\Geometry\Point;
 use BadMethodCallException;
 use MongoCommandCursor;
@@ -60,7 +62,7 @@ class Collection
     /**
      * The MongoCollection instance being wrapped.
      *
-     * @var \MongoCollection
+     * @var \MongoDB\Collection
      */
     protected $mongoCollection;
 
@@ -75,11 +77,11 @@ class Collection
      * Constructor.
      *
      * @param Database         $database        Database to which this collection belongs
-     * @param \MongoCollection $mongoCollection MongoCollection instance being wrapped
+     * @param MongoCollection $mongoCollection MongoCollection instance being wrapped
      * @param EventManager     $evm             EventManager instance
      * @param integer          $numRetries      Number of times to retry queries
      */
-    public function __construct(Database $database, \MongoCollection $mongoCollection, EventManager $evm, $numRetries = 0)
+    public function __construct(Database $database, MongoCollection $mongoCollection, EventManager $evm, $numRetries = 0)
     {
         $this->database = $database;
         $this->mongoCollection = $mongoCollection;
@@ -886,7 +888,7 @@ class Collection
             : array($options, array());
 
         $command = array();
-        $command['aggregate'] = $this->mongoCollection->getName();
+        $command['aggregate'] = $this->mongoCollection->getCollectionName();
         $command['pipeline'] = $pipeline;
         $command = array_merge($command, $commandOptions);
 
@@ -1015,7 +1017,7 @@ class Collection
             : array($options, array());
 
         $command = array();
-        $command['distinct'] = $this->mongoCollection->getName();
+        $command['distinct'] = $this->mongoCollection->getCollectionName();
         $command['key'] = $field;
         $command['query'] = (object) $query;
         $command = array_merge($command, $commandOptions);
@@ -1173,11 +1175,11 @@ class Collection
             : array($options, array());
 
         $command = array();
-        $command['ns'] = $this->mongoCollection->getName();
+        $command['ns'] = $this->mongoCollection->getCollectionName();
         $command['initial'] = (object) $initial;
         $command['$reduce'] = $reduce;
 
-        if (is_string($keys) || $keys instanceof \MongoCode) {
+        if (is_string($keys) || $keys instanceof Javascript) {
             $command['$keyf'] = $keys;
         } else {
             $command['key'] = $keys;
@@ -1187,7 +1189,7 @@ class Collection
 
         foreach (array('$keyf', '$reduce', 'finalize') as $key) {
             if (isset($command[$key]) && is_string($command[$key])) {
-                $command[$key] = new \MongoCode($command[$key]);
+                $command[$key] = new Javascript($command[$key]);
             }
         }
 
@@ -1250,7 +1252,7 @@ class Collection
             : array($options, array());
 
         $command = array();
-        $command['mapreduce'] = $this->mongoCollection->getName();
+        $command['mapreduce'] = $this->mongoCollection->getCollectionName();
         $command['map'] = $map;
         $command['reduce'] = $reduce;
         $command['query'] = (object) $query;
@@ -1259,7 +1261,7 @@ class Collection
 
         foreach (array('map', 'reduce', 'finalize') as $key) {
             if (isset($command[$key]) && is_string($command[$key])) {
-                $command[$key] = new \MongoCode($command[$key]);
+                $command[$key] = new Javascript($command[$key]);
             }
         }
 
@@ -1307,7 +1309,7 @@ class Collection
             : array($options, array());
 
         $command = array();
-        $command['geoNear'] = $this->mongoCollection->getName();
+        $command['geoNear'] = $this->mongoCollection->getCollectionName();
         $command['near'] = $near;
         $command['spherical'] = isset($near['type']);
         $command['query'] = (object) $query;

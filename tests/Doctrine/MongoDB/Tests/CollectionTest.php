@@ -103,7 +103,7 @@ class CollectionTest extends \PHPUnit_Framework_TestCase
 
         $mongoCollection = $this->getMockMongoCollection();
         $mongoCollection->expects($this->once())
-            ->method('aggregateCursor')
+            ->method('aggregate')
             ->with($pipeline, array())
             ->will($this->returnValue($mongoCommandCursor));
 
@@ -1061,7 +1061,7 @@ class CollectionTest extends \PHPUnit_Framework_TestCase
             ->getMock();
 
         $mc->expects($this->any())
-            ->method('getName')
+            ->method('getCollectionName')
             ->will($this->returnValue(self::collectionName));
 
         return $mc;
@@ -1094,7 +1094,7 @@ class CollectionTest extends \PHPUnit_Framework_TestCase
         return $point;
     }
 
-    private function getTestCollection(Database $db = null, MongoCollection $mc = null, EventManager $em = null)
+    private function getTestCollection(Database $db = null, \MongoDB\Collection $mc = null, EventManager $em = null)
     {
         $db = $db ?: $this->getMockDatabase();
         $mc = $mc ?: $this->getMockMongoCollection();

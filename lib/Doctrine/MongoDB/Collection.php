@@ -940,7 +940,7 @@ class Collection
 
         $mongoCollection = $this->mongoCollection;
         $commandCursor = $this->retry(function() use ($mongoCollection, $pipeline, $commandOptions) {
-            return $mongoCollection->aggregateCursor($pipeline, $commandOptions);
+            return $mongoCollection->aggregate($pipeline, $commandOptions);
         });
 
         $commandCursor = $this->wrapCommandCursor($commandCursor);

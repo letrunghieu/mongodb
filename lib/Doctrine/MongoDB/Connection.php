@@ -98,7 +98,7 @@ class Connection
     public function close()
     {
         $this->initialize();
-        return $this->mongoClient->close();
+        return true;
     }
 
     /**
@@ -112,9 +112,8 @@ class Connection
         $this->initialize();
 
         $mongoClient = $this->mongoClient;
-        return $this->retry(function() use ($mongoClient) {
-            return $mongoClient->connect();
-        });
+
+        return true;
     }
 
     /**
@@ -133,7 +132,7 @@ class Connection
         }
 
         $this->initialize();
-        $result = $this->mongoClient->dropDB($database);
+        $result = $this->mongoClient->dropDatabase($database);
 
         if ($this->eventManager->hasListeners(Events::postDropDatabase)) {
             $this->eventManager->dispatchEvent(Events::postDropDatabase, new EventArgs($this, $result));
@@ -311,7 +310,7 @@ class Connection
     public function listDatabases()
     {
         $this->initialize();
-        return $this->mongoClient->listDBs();
+        return $this->mongoClient->listDatabases();
     }
 
     /**
@@ -388,7 +387,8 @@ class Connection
     public function __toString()
     {
         $this->initialize();
-        return $this->mongoClient->__toString();
+//        return $this->mongoClient->__toString();
+        return get_class($this->mongoClient);
     }
 
     /**

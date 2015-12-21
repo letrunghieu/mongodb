@@ -3,6 +3,8 @@
 namespace Doctrine\MongoDB\Tests;
 
 use Doctrine\MongoDB\Connection;
+use MongoDB\Client;
+use MongoDB\Driver\ReadPreference;
 use PHPUnit_Framework_TestCase;
 use Mongo;
 
@@ -133,18 +135,18 @@ class ConnectionTest extends PHPUnit_Framework_TestCase
 
         $mongoClient->expects($this->at(0))
             ->method('setReadPreference')
-            ->with(\MongoClient::RP_PRIMARY)
+            ->with(ReadPreference::RP_PRIMARY)
             ->will($this->returnValue(true));
 
         $mongoClient->expects($this->at(1))
             ->method('setReadPreference')
-            ->with(\MongoClient::RP_SECONDARY_PREFERRED, array(array('dc' => 'east')))
+            ->with(ReadPreference::RP_SECONDARY_PREFERRED, array(array('dc' => 'east')))
             ->will($this->returnValue(true));
 
         $conn = $this->getTestConnection($mongoClient);
 
-        $this->assertTrue($conn->setReadPreference(\MongoClient::RP_PRIMARY));
-        $this->assertTrue($conn->setReadPreference(\MongoClient::RP_SECONDARY_PREFERRED, array(array('dc' => 'east'))));
+        $this->assertTrue($conn->setReadPreference(ReadPreference::RP_PRIMARY));
+        $this->assertTrue($conn->setReadPreference(ReadPreference::RP_SECONDARY_PREFERRED, array(array('dc' => 'east'))));
     }
 
     public function testToString()
@@ -177,7 +179,7 @@ class ConnectionTest extends PHPUnit_Framework_TestCase
 
     private function getMockMongo()
     {
-        return $this->getMock('Mongo', array(), array(), '', false, false);
+        return $this->getMock(Client::class, array(), array(), '', false, false);
     }
 
     private function getMockMongoClient()

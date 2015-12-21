@@ -23,6 +23,7 @@ use Doctrine\Common\EventManager;
 use Doctrine\MongoDB\Event\CreateCollectionEventArgs;
 use Doctrine\MongoDB\Event\EventArgs;
 use Doctrine\MongoDB\Event\MutableEventArgs;
+use MongoDB\Database as MongoDB;
 
 /**
  * Wrapper for the MongoDB class.
@@ -52,7 +53,7 @@ class Database
     /**
      * The MongoDB instance being wrapped.
      *
-     * @var \MongoDB
+     * @var MongoDB
      */
     protected $mongoDB;
 
@@ -67,11 +68,11 @@ class Database
      * Constructor.
      *
      * @param Connection      $connection Connection to which this database belongs
-     * @param \MongoDB        $mongoDB    MongoDB instance being wrapped
+     * @param MongoDB        $mongoDB    MongoDB instance being wrapped
      * @param EventManager    $evm        EventManager instance
      * @param boolean|integer $numRetries Number of times to retry queries
      */
-    public function __construct(Connection $connection, \MongoDB $mongoDB, EventManager $evm, $numRetries = 0)
+    public function __construct(Connection $connection, MongoDB $mongoDB, EventManager $evm, $numRetries = 0)
     {
         $this->connection = $connection;
         $this->mongoDB = $mongoDB;

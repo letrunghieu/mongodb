@@ -21,6 +21,7 @@ namespace Doctrine\MongoDB;
 
 use BadMethodCallException;
 use MongoCommandCursor;
+use MongoDB\Driver\Cursor as MongoCursor;
 
 /**
  * Wrapper for the PHP MongoCommandCursor class.
@@ -33,7 +34,7 @@ class CommandCursor implements Iterator
     /**
      * The MongoCommandCursor instance being wrapped.
      *
-     * @var MongoCommandCursor
+     * @var MongoCursor
      */
     private $mongoCommandCursor;
 
@@ -50,10 +51,10 @@ class CommandCursor implements Iterator
     /**
      * Constructor.
      *
-     * @param MongoCommandCursor $mongoCommandCursor MongoCommandCursor instance being wrapped
+     * @param MongoCursor $mongoCommandCursor MongoCommandCursor instance being wrapped
      * @param integer            $numRetries         Number of times to retry queries
      */
-    public function __construct(MongoCommandCursor $mongoCommandCursor, $numRetries = 0)
+    public function __construct(MongoCursor $mongoCommandCursor, $numRetries = 0)
     {
         $this->mongoCommandCursor = $mongoCommandCursor;
         $this->numRetries = (integer) $numRetries;
